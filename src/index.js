@@ -8,6 +8,8 @@ const morgan = require("morgan");
 const config = require("./config/config");
 const App = express();
 
+const MysqlConnection = require("./config/MysqlConnection");
+
 const main = () => {
     App.set("port", config.APP_PORT);
     App.use(cors());
@@ -19,4 +21,7 @@ const main = () => {
     console.log("API waiting connections at " + App.get("port") + " port");
 };
 
-main();
+new MysqlConnection().connect().then(() => {
+    console.log("Mysql is online");
+    main();
+}).catch(err => { console.log(err.message); });

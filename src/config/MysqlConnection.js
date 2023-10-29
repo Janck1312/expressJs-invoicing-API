@@ -1,32 +1,27 @@
 "use strict";
 
-const mysql = require("promise-mysql");
 const config = require("./config");
+const Sequelize = require("sequelize");
 
 class MysqlConnection {
-
-    constructor() { }
-
-    _mysql = mysql;
     connection = null;
 
-    createConnection() {
-        this.connection = this._mysql.createConnection({
+    constructor() {
+        this.connection = new Sequelize(config.DB_NAME, config.DB_USER, config.DB_PASSWORD, {
             host: config.DB_HOST,
-            database: config.DB_NAME,
-            user: config.DB_USER,
-            password: config.DB_PASSWORD
+            dialect: "mysql"
         });
     }
 
-    async destroyConnection() {
-        await this.connection.destroy();
+    async connect() 
+    {
+        return await this.connection.authenticate();
     }
 
-    getConnection() {
+    getConnection() 
+    {
         return this.connection;
     }
-
 }
 
 module.exports = MysqlConnection;
