@@ -1,9 +1,11 @@
 "use strict";
 
 const User = require("../entities/User");
+const BcryptPassword = require("../utils/bcrypt-password");
 
 class UserService {
     userEntite = User;
+    _BcryptPassword = new BcryptPassword();
 
     constructor(){}
 
@@ -47,7 +49,9 @@ class UserService {
     async findById(request) {
         try {
             let { id } = request.params;
-            return await this.userEntite.findOne({ where: { id } });
+            let user = await this.userEntite.findOne({ where: { id } });
+            delete user.password;
+            return user;
         } catch (error) {
             return error.message;
         }
@@ -56,7 +60,12 @@ class UserService {
     async save(request) {
         try {
             await this.validatePost(request);
-            return await this.userEntite.create({...request.body, created_at:new Date(), updated_at: new Date()});
+            return await this.userEntite.create({ 
+                ...request.body, 
+                password: await this._BcryptPassword.encryptPassword(request.body.password), 
+                created_at:new Date(), 
+                updated_at: new Date()
+            });
         } catch (error) {
             return error.message;
         }
@@ -67,7 +76,11 @@ class UserService {
             const { body, params } = request;
             await this.validatePut(request);
             let customer = await this.userEntite.findOne({ where: { id: params.id } });
-            customer.set({ ...body, updated_at: new Date() });
+            customer.set({
+                ...body, 
+                updated_at: new Date(),
+                password: await this._BcryptPassword.encryptPassword(body.password) 
+            });
             return await customer.save();
         } catch (error) {
             return error.message;
