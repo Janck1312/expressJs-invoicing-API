@@ -7,6 +7,7 @@ const { Router } = require("express");
 */
 const CustomerController = require("./customer.controller");
 const UserController = require("./user.controller");
+const AuthController = require("./auth.controller");
 
 const index = Router();
 
@@ -15,7 +16,8 @@ const index = Router();
 */
 const AppRoutes = [
     new CustomerController().Routes,
-    new UserController().Routes
+    new UserController().Routes,
+    new AuthController().Routes
 ];
 
 index.use(AppRoutes);
