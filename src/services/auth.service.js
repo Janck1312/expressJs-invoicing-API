@@ -38,6 +38,12 @@ class AuthService {
 
     async me(request)
     {
+        try {
+            const { userInSession } = request.params;
+            return await this.userEntitie.findOne({where:{ email: userInSession.email }});
+        } catch (error){
+            return error.message;
+        }
 
     }
 
